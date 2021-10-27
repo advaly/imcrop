@@ -1,22 +1,28 @@
 ## Summary
 
-Image cropping tool.
+Image manipulation tool.
 
 
 ## Usage
 
 ```
-$ imcrop geometry src_file out_file
+imcrop 0.1.0
+ADVALY SYSTEM Inc.
+Image manipulation tool
+
+USAGE:
+    imcrop [OPTIONS] <src file> <out file>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -c, --crop <crop>        Cropping geometory 'WxH+X+Y'
+    -s, --resize <resize>    Resizing geometory 'WxH'
+    -r, --rotate <rotate>    Rotate 90/180/270
+
+ARGS:
+    <src file>    Input image file
+    <out file>    Output image file
 ```
-
-Argument | Description
--- | --
-geometry | Cropping region with format of "`Width`x`Height`+`x`+`y`"
-src_file | Input image file
-out_file | Cropped output file
-
-The format of `geometry` is same as ImageMagick.
-
-e.g. "200x100+15+30" represents to crop 200 width x 100 Height region with offset to upper left point of (15, 30).
-
-You can save output image file as different image type. For example, arguments with src_file = "hoge.jpg" and out_file = "fuga.png" means input JPEG image format and output PNG image format.

@@ -10,6 +10,7 @@ edition = "2018"
 [dependencies]
 image = "0.23"
 regex = "1.5.4"
+clap = "2.33"
 
 [profile.release]
 opt-level = 'z'
