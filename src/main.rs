@@ -44,6 +44,16 @@ fn main() {
     // Load input image
     let mut im = image::open(src_file).unwrap();
 
+    // Rotate
+    if let Some(rotate) = args.value_of("rotate") {
+        im = match rotate {
+            "90" => im.rotate90(),
+            "180" => im.rotate180(),
+            "270" => im.rotate270(),
+            _ => im
+        };
+    }
+
     // Crop region
     if let Some(region) = args.value_of("crop") {
         let re = Regex::new(r"(\d+)x(\d+)\+(\d+)\+(\d+)").unwrap();
@@ -62,16 +72,6 @@ fn main() {
         let resize_w: u32 = caps[1].parse().unwrap();
         let resize_h: u32 = caps[2].parse().unwrap();
         im = im.resize(resize_w, resize_h, FilterType::Triangle);
-    }
-
-    // Rotate
-    if let Some(rotate) = args.value_of("rotate") {
-        im = match rotate {
-            "90" => im.rotate90(),
-            "180" => im.rotate180(),
-            "270" => im.rotate270(),
-            _ => im
-        };
     }
 
     // Save output image

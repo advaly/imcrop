@@ -26,3 +26,11 @@ ARGS:
     <src file>    Input image file
     <out file>    Output image file
 ```
+
+## Note
+
+Processing order is as follows.
+
+1. Rotate
+1. Crop
+1. Resize
