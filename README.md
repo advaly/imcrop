@@ -2,11 +2,14 @@
 
 Image manipulation tool.
 
+## Build
+- cargo 1.60.0-nightly (95bb3c92b 2022-01-18)
+- rustc 1.60.0-nightly (8cdb3cd94 2022-01-25)
 
 ## Usage
 
 ```
-imcrop 0.1.0
+imcrop 0.1.1
 ADVALY SYSTEM Inc.
 Image manipulation tool
 
@@ -18,6 +21,7 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
+    -b, --canvas <canvas>    Overlay input image on canvas with geometory 'WxH'
     -c, --crop <crop>        Cropping geometory 'WxH+X+Y'
     -s, --resize <resize>    Resizing geometory 'WxH'
     -r, --rotate <rotate>    Rotate 90/180/270
@@ -32,5 +36,6 @@ ARGS:
 Processing order is as follows.
 
 1. Rotate
+1. Canvas
 1. Crop
 1. Resize

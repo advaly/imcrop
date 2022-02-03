@@ -1,5 +1,5 @@
-use image::imageops::FilterType;
-use std::env;
+use image::{imageops::{FilterType, self}, DynamicImage};
+use std::{env, cmp};
 use regex::Regex;
 use clap::{App, Arg};
 
@@ -19,6 +19,11 @@ fn main() {
         .arg(Arg::with_name("out file")
             .help("Output image file")
             .required(true)
+            .takes_value(true)
+        )
+        .arg(Arg::with_name("canvas")
+           .short("b").long("canvas")
+            .help("Overlay input image on canvas with geometory 'WxH'")
             .takes_value(true)
         )
         .arg(Arg::with_name("crop")
@@ -54,6 +59,17 @@ fn main() {
         };
     }
 
+    // Canvas
+    if let Some(canvas) = args.value_of("canvas") {
+        let re = Regex::new(r"(\d+)x(\d+)").unwrap();
+        let caps = re.captures(canvas).unwrap();
+        let canvas_w: u32 = cmp::max(caps[1].parse().unwrap(), im.width());
+        let canvas_h: u32 = cmp::max(caps[2].parse().unwrap(), im.height());
+        let mut im_canvas = DynamicImage::new_rgb8(canvas_w, canvas_h);
+        imageops::overlay(&mut im_canvas, &im, 0, 0);
+        im = im_canvas;
+    }
+    
     // Crop region
     if let Some(region) = args.value_of("crop") {
         let re = Regex::new(r"(\d+)x(\d+)\+(\d+)\+(\d+)").unwrap();
