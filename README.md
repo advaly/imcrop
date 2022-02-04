@@ -21,10 +21,11 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-    -b, --canvas <canvas>    Overlay input image on canvas with geometory 'WxH'
-    -c, --crop <crop>        Cropping geometory 'WxH+X+Y'
-    -s, --resize <resize>    Resizing geometory 'WxH'
-    -r, --rotate <rotate>    Rotate 90/180/270
+    -b, --canvas <canvas>           Overlay input image on canvas with geometory 'WxH'
+    -c, --crop <crop>               Cropping geometory 'WxH+X+Y'
+    -o, --overlay <overlay file>    Overlay a transparent image on the final image
+    -s, --resize <resize>           Resizing geometory 'WxH'
+    -r, --rotate <rotate>           Rotate 90/180/270
 
 ARGS:
     <src file>    Input image file
@@ -39,3 +40,4 @@ Processing order is as follows.
 1. Canvas
 1. Crop
 1. Resize
+1. Overlay
