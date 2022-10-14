@@ -31,6 +31,16 @@ fn main() {
             .help("Cropping geometory 'WxH+X+Y'")
             .takes_value(true)
         )
+        .arg(Arg::with_name("contrast")
+            .long("contrast")
+            .help("Adjust contrast by f32. Negative values decrease and positive values increase")
+            .takes_value(true)
+        )
+        .arg(Arg::with_name("brightness")
+            .long("brightness")
+            .help("Adjust brightness by i32. Negative values decrease and positive values increase")
+            .takes_value(true)
+        )
         .arg(Arg::with_name("resize")
             .short("s").long("resize")
             .help("Resizing geometory 'WxH'")
@@ -64,17 +74,6 @@ fn main() {
         };
     }
 
-    // Canvas
-    if let Some(canvas) = args.value_of("canvas") {
-        let re = Regex::new(r"(\d+)x(\d+)").unwrap();
-        let caps = re.captures(canvas).unwrap();
-        let canvas_w: u32 = cmp::max(caps[1].parse().unwrap(), im.width());
-        let canvas_h: u32 = cmp::max(caps[2].parse().unwrap(), im.height());
-        let mut im_canvas = DynamicImage::new_rgb8(canvas_w, canvas_h);
-        imageops::overlay(&mut im_canvas, &im, 0, 0);
-        im = im_canvas;
-    }
-    
     // Crop region
     if let Some(region) = args.value_of("crop") {
         let re = Regex::new(r"(\d+)x(\d+)\+(\d+)\+(\d+)").unwrap();
@@ -95,6 +94,29 @@ fn main() {
         im = im.resize(resize_w, resize_h, FilterType::Triangle);
     }
 
+    // Brightness
+    if let Some(brightness) = args.value_of("brightness") {
+        let b: i32 = brightness.parse().unwrap();
+        imageops::colorops::brighten_in_place(&mut im, b);
+    }
+
+    // Contrast
+    if let Some(contrast) = args.value_of("contrast") {
+        let c: f32 = contrast.parse().unwrap();
+        imageops::colorops::contrast_in_place(&mut im, c);
+    }
+
+    // Canvas
+    if let Some(canvas) = args.value_of("canvas") {
+        let re = Regex::new(r"(\d+)x(\d+)").unwrap();
+        let caps = re.captures(canvas).unwrap();
+        let canvas_w: u32 = cmp::max(caps[1].parse().unwrap(), im.width());
+        let canvas_h: u32 = cmp::max(caps[2].parse().unwrap(), im.height());
+        let mut im_canvas = DynamicImage::new_rgb8(canvas_w, canvas_h);
+        imageops::overlay(&mut im_canvas, &im, 0, 0);
+        im = im_canvas;
+    }
+    
     // Overlay
     if let Some(overlay_file) = args.value_of("overlay file") {
         let im_overlay = image::open(overlay_file).unwrap();
