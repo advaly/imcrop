@@ -1,5 +1,5 @@
-use image::{imageops::{FilterType, self}, DynamicImage};
-use std::{env, cmp};
+use image::{imageops::{FilterType, self}, DynamicImage, codecs::jpeg::JpegEncoder};
+use std::{env, cmp, io::BufWriter, fs::File};
 use regex::Regex;
 use clap::{App, Arg};
 
@@ -54,6 +54,11 @@ fn main() {
         .arg(Arg::with_name("overlay file")
             .short("o").long("overlay")
             .help("Overlay a transparent image on the final image")
+            .takes_value(true)
+        )
+        .arg(Arg::with_name("quality")
+            .short("q").long("quality")
+            .help("Output image quality in the range 1-100 where 1 is the worst and 100 is the best")
             .takes_value(true)
         )
         .get_matches();
@@ -124,5 +129,13 @@ fn main() {
     }
 
     // Save output image
-    im.save(out_file).unwrap();
+    if let Some(quality) = args.value_of("quality") {
+        let q: u8 = quality.parse().unwrap();
+        let writer = BufWriter::new(File::create(out_file).unwrap());
+        let mut enc = JpegEncoder::new_with_quality(writer, q);
+        enc.encode(im.as_bytes(), im.width(), im.height(), im.color()).unwrap();
+    }
+    else {
+        im.save(out_file).unwrap();
+    }
 }

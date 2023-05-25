@@ -9,7 +9,7 @@ Image manipulation tool.
 ## Usage
 
 ```
-imcrop 0.1.2
+imcrop 0.1.3
 ADVALY SYSTEM Inc.
 Image manipulation tool
 
@@ -26,6 +26,7 @@ OPTIONS:
         --contrast <contrast>        Adjust contrast by f32. Negative values decrease and positive values increase
     -c, --crop <crop>                Cropping geometory 'WxH+X+Y'
     -o, --overlay <overlay file>     Overlay a transparent image on the final image
+    -q, --quality <quality>          Output image quality in the range 1-100 where 1 is the worst and 100 is the best
     -s, --resize <resize>            Resizing geometory 'WxH'
     -r, --rotate <rotate>            Rotate 90/180/270
 
