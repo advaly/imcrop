@@ -3,6 +3,39 @@ use std::{env, cmp, io::BufWriter, fs::File};
 use regex::Regex;
 use clap::{App, Arg};
 
+fn combine_images(src_files: Vec<&str>, direction: &str) -> DynamicImage {
+    let images: Vec<DynamicImage> = src_files.iter()
+        .map(|&src_file| image::open(src_file).unwrap())
+        .collect();
+
+    let (image_width, image_height) = (images[0].width(), images[0].height());
+    let (total_width, total_height) = match direction {
+        "h" => (image_width * images.len() as u32, image_height),
+        "v" => (image_width, image_height * images.len() as u32),
+        _ => panic!("Invalid combine direction. Use 'h' or 'v'."),
+    };
+
+    let mut combined_image = DynamicImage::new_rgb8(total_width, total_height);
+
+    // Overlay each image onto the combined image
+    let mut offset = 0;
+    for im in images {
+        match direction {
+            "h" => {
+                imageops::overlay(&mut combined_image, &im, offset, 0);
+                offset += image_width as i64;
+            }
+            "v" => {
+                imageops::overlay(&mut combined_image, &im, 0, offset);
+                offset += image_height as i64;
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    combined_image
+}
+
 fn main() {
     // Parse command line arguments
     let args = App::new("imcrop")
@@ -13,7 +46,7 @@ fn main() {
 
         // options
         .arg(Arg::with_name("src file")
-            .help("Input image file")
+            .help("Input image file. Separate by commas to specify multiple files in combine mode")
             .required(true)    
         )
         .arg(Arg::with_name("out file")
@@ -61,13 +94,25 @@ fn main() {
             .help("Output image quality in the range 1-100 where 1 is the worst and 100 is the best")
             .takes_value(true)
         )
+        .arg(Arg::with_name("combine")
+            .long("combine")
+            .help("Combine multiple images into one image. Each image size must be same. 'h' or 'v'")
+            .takes_value(true)
+        )
         .get_matches();
 
     let src_file = args.value_of("src file").unwrap();
     let out_file = args.value_of("out file").unwrap();
 
-    // Load input image
-    let mut im = image::open(src_file).unwrap();
+    // Input image
+    let mut im = if let Some(direction) = args.value_of("combine") {
+        // Combine multiple images
+        let src_files: Vec<&str> = src_file.split(',').collect();
+        combine_images(src_files, direction)
+    } else {
+        // Load single input image
+        image::open(src_file).unwrap()
+    };
 
     // Rotate
     if let Some(rotate) = args.value_of("rotate") {
@@ -133,7 +178,7 @@ fn main() {
         let q: u8 = quality.parse().unwrap();
         let writer = BufWriter::new(File::create(out_file).unwrap());
         let mut enc = JpegEncoder::new_with_quality(writer, q);
-        enc.encode(im.as_bytes(), im.width(), im.height(), im.color()).unwrap();
+        enc.encode(im.as_bytes(), im.width(), im.height(), im.color().into()).unwrap();
     }
     else {
         im.save(out_file).unwrap();
